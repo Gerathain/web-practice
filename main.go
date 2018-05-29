@@ -12,21 +12,38 @@ type response struct {
 	Message string
 }
 
+type greeter struct {
+	Default string
+}
+
+func NewGreeter(greeting string) *greeter {
+	g := new(greeter)
+	g.Default = greeting
+	return g
+}
+
+func (this *greeter) ServeHTTP(respWriter http.ResponseWriter, point *http.Request) {
+	req := new(request)
+	decoder := json.NewDecoder(point.Body)
+
+	if err := decoder.Decode(req); err != nil {
+		panic(err)
+	}
+
+	resp := new(response)
+	resp.Message = this.Default
+
+	res2B, _ := json.Marshal(resp)
+
+	fmt.Fprintf(respWriter, string(res2B))
+}
+
 func main() {
-	http.HandleFunc("/event1", func(respWriter http.ResponseWriter, point *http.Request) {
-		req := new(request)
-		decoder := json.NewDecoder(point.Body)
-		err := decoder.Decode(req)
-		if err != nil {
-			panic(err)
-		}
+	g := NewGreeter("bye")
+	http.Handle("/event1", g)
 
-		resp := new(response)
-		resp.Message = "Bye"
-		res2B, _ := json.Marshal(resp)
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		panic(err)
+	}
 
-		fmt.Fprintf(respWriter, string(res2B))
-	})
-
-	http.ListenAndServe(":8080", nil)
 }
