@@ -143,8 +143,15 @@ func main() {
 
 	group := getState(keyURL)
 	on := group.GroupState.All_on
+	ct := group.Action.Ct
+	if ct < MAX_CT { /*TODO define max ct*/
+		ct++ /*TODO decide on rate at which lights get warmer */
+	}
+	res3, _ := json.Marshall(group)
 	fmt.Printf("On: %t\n", on)
 	if on {
+		/* put the group with the new ct
+		need a to change func (or create new one) as it currently is hard coded to post to the wrong level*/
 		putRequest(keyURL, bytes.NewReader(res2))
 	} else {
 		putRequest(keyURL, bytes.NewReader(res))
