@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+const MAX_CT int = 400 /*TODO check if this is correct*/
+
 type State struct {
 	On bool `json:"on,omitempty"`
 	Ct int  `json:"ct,omitempty"`
@@ -120,7 +122,10 @@ func getState(url string) Group {
 }
 
 func main() {
-	/*g := NewGreeter("bye")
+	/* This will be useful if I want the script to return something to the
+	   user via HTTP
+	
+	g := NewGreeter("bye")
 	http.Handle("/event1", g)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -142,18 +147,17 @@ func main() {
 	res2, _ := json.Marshal(s2)
 
 	group := getState(keyURL)
-	on := group.GroupState.All_on
 	ct := group.Action.Ct
-	if ct < MAX_CT { /*TODO define max ct*/
+
+	if ct < MAX_CT {
 		ct++ /*TODO decide on rate at which lights get warmer */
 	}
 	res3, _ := json.Marshall(group)
 	fmt.Printf("On: %t\n", on)
-	if on {
-		/* put the group with the new ct
+	if group.State.All_on {
+		/* PUT the group with the new ct
 		need a to change func (or create new one) as it currently is hard coded to post to the wrong level*/
 		putRequest(keyURL, bytes.NewReader(res2))
-	} else {
-		putRequest(keyURL, bytes.NewReader(res))
-	}
+	} 
+	/*else lights are off so do nothing*/
 }
