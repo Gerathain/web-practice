@@ -11,7 +11,8 @@ import (
 	"strings"
 )
 
-const MAX_CT int = 400 /*TODO check if this is correct*/
+const MAX_CT int = 454
+const MIN_CT int = 153
 
 type State struct {
 	On bool `json:"on,omitempty"`
@@ -135,29 +136,27 @@ func main() {
 
 	k, _ := ioutil.ReadFile("./apiKey")
 	apiKey := strings.TrimSuffix(string(k), "\n")
-	keyURL := "http://192.168.1.4/api/" + string(apiKey)
-	fmt.Println(keyURL)
+	keyURL := "http://192.168.0.17/api/" + string(apiKey)
+	/* need to create function to get the URL of the bridge properly. This is not too hard as it
+	is documented by Philips
 
-	s := new(State)
-	s.On = true
-	res, _ := json.Marshal(s)
-
-	s2 := new(State)
-	s2.Ct = 200
-	res2, _ := json.Marshal(s2)
+	state := new(State)
 
 	group := getState(keyURL)
-	ct := group.Action.Ct
+	actualCt := group.Action.Ct
 
-	if ct < MAX_CT {
-		ct++ /*TODO decide on rate at which lights get warmer */
+	if actualCt < MAX_CT {
+		state.Ct = actualCt + 10 /*TODO decide on rate at which lights get warmer */
+		/* for the minute, increasing ct by 10 per cycle seems good. and means the script doesnt have to run so frequently,
+		might change to 5 or so */
 	}
-	res3, _ := json.Marshall(group)
-	fmt.Printf("On: %t\n", on)
-	if group.State.All_on {
+	res, _ := json.Marshal(state)
+
+	if group.GroupState.All_on {
 		/* PUT the group with the new ct
-		need a to change func (or create new one) as it currently is hard coded to post to the wrong level*/
-		putRequest(keyURL, bytes.NewReader(res2))
+		need a to change func (or create new one) as it currently is hard coded to post to the wrong level
+		To get around this, I am creating a second JSON object at a different level, is quite wasteful*/
+		putRequest(keyURL, bytes.NewReader(res))
 	} 
 	/*else lights are off so do nothing*/
 }
