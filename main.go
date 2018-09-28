@@ -143,22 +143,16 @@ func main() {
 
 	var roomNumber int = 1 /* TODO get the room number dynamically */
 
-	state := new(State)
-
 	group := getState(keyURL, roomNumber) 
 	actualCt := group.Action.Ct
 
 	if actualCt < MAX_CT {
-		state.Ct = actualCt + 10 /*TODO decide on rate at which lights get warmer */
 		/* for the minute, increasing ct by 10 per cycle seems good. and means the script doesnt have to run so frequently,
 		might change to 5 or so */
 		group.Action.Ct += 10
 	}
 
 	res, _ := json.Marshal(group.Action)
-	res2, _ := json.Marshal(state)
-	fmt.Println(string(res2))
-	fmt.Println(string(res))
 
 	if group.GroupState.All_on {
 		/* PUT the group with the new ct
