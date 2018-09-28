@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"strconv"
 )
 
 const MAX_CT int = 454
@@ -77,10 +78,10 @@ func (this *greeter) ServeHTTP(respWriter http.ResponseWriter, point *http.Reque
 }
 */
 
-func putRequest(keyURL string, data io.Reader) {
+func putRequest(keyURL string, data io.Reader, roomNumber int, putLocation string) {
 	client := &http.Client{}
 
-	URL := keyURL + "/groups/1/action"
+	URL := keyURL + "/groups/" + strconv.Itoa(roomNumber) + "/" + putLocation
 
 	req, err := http.NewRequest(http.MethodPut, URL, data)
 	if err != nil {
@@ -96,10 +97,10 @@ func putRequest(keyURL string, data io.Reader) {
 	}
 }
 
-func getState(url string) Group {
+func getState(url string, roomNumber int) Group {
 	group := Group{}
 
-	fullURL := url + "/groups/1/"
+	fullURL := url + "/groups/" + strconv.Itoa(roomNumber)
 	response, err := http.Get(fullURL)
 	if err != nil {
 		fmt.Println(err)
@@ -137,26 +138,33 @@ func main() {
 	k, _ := ioutil.ReadFile("./apiKey")
 	apiKey := strings.TrimSuffix(string(k), "\n")
 	keyURL := "http://192.168.0.17/api/" + string(apiKey)
-	/* need to create function to get the URL of the bridge properly. This is not too hard as it
-	is documented by Philips
+	/* TODO need to create function to get the URL of the bridge properly. This is not too hard as it
+	is documented by Philips */
+
+	var roomNumber int = 1 /* TODO get the room number dynamically */
 
 	state := new(State)
 
-	group := getState(keyURL)
+	group := getState(keyURL, roomNumber) 
 	actualCt := group.Action.Ct
 
 	if actualCt < MAX_CT {
 		state.Ct = actualCt + 10 /*TODO decide on rate at which lights get warmer */
 		/* for the minute, increasing ct by 10 per cycle seems good. and means the script doesnt have to run so frequently,
 		might change to 5 or so */
+		group.Action.Ct += 10
 	}
-	res, _ := json.Marshal(state)
+
+	res, _ := json.Marshal(group.Action)
+	res2, _ := json.Marshal(state)
+	fmt.Println(string(res2))
+	fmt.Println(string(res))
 
 	if group.GroupState.All_on {
 		/* PUT the group with the new ct
 		need a to change func (or create new one) as it currently is hard coded to post to the wrong level
 		To get around this, I am creating a second JSON object at a different level, is quite wasteful*/
-		putRequest(keyURL, bytes.NewReader(res))
+		putRequest(keyURL, bytes.NewReader(res), roomNumber, "action")
 	} 
 	/*else lights are off so do nothing*/
 }
