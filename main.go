@@ -42,6 +42,13 @@ type Group struct {
 	Action     Action     `json:"action"`
 }
 
+type Config struct {
+	ControllerOn bool `json:"controller_on"`	
+	StartHour int `json:"start_hour"`
+	StartMinute int `json:"start_minute"`
+	WarmingRate int `json:"warming_rate"`
+}
+
 type request struct {
 	Name string
 }
@@ -97,6 +104,7 @@ func putRequest(keyURL string, data io.Reader, roomNumber int, putLocation strin
 	}
 }
 
+/* Gets the state of the lights in a room and returns them in a Group struct */
 func getState(url string, roomNumber int) Group {
 	group := Group{}
 
@@ -123,6 +131,21 @@ func getState(url string, roomNumber int) Group {
 	return group
 }
 
+/* Reads the specified config file and returns a Config variable with the 
+controller's configuration
+*/
+func readConfig( configFileName string ) Config {
+	config := Config{}
+
+	configFile, _ := ioutil.ReadFile( "./" + configFileName )
+	if err := json.Unmarshal(configFile, &config); err == nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return config
+}
+
 func main() {
 	/* This will be useful if I want the script to return something to the
 	   user via HTTP
@@ -134,6 +157,15 @@ func main() {
 		panic(err)
 	}
 	*/
+
+	config := readConfig("config")
+	if config == nil {
+		fmt.Println( "config file not read correctly" )
+		return
+	}
+	if config.ControllerOn == false {
+		return
+	}
 
 	k, _ := ioutil.ReadFile("./apiKey")
 	apiKey := strings.TrimSuffix(string(k), "\n")
