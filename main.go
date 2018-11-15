@@ -123,6 +123,12 @@ func getState(url string, roomNumber int) Group {
 	return group
 }
 
+/* TODO need to change the function to get the URL of the bridge properly.
+This should not be too hard as it is documented by Philips */
+func getBridgeUrl() string {
+	return "http://192.168.0.17/api/"
+}
+
 func main() {
 	/* This will be useful if I want the script to return something to the
 	   user via HTTP
@@ -137,9 +143,7 @@ func main() {
 
 	k, _ := ioutil.ReadFile("./apiKey")
 	apiKey := strings.TrimSuffix(string(k), "\n")
-	keyURL := "http://192.168.0.17/api/" + string(apiKey)
-	/* TODO need to create function to get the URL of the bridge properly. This is not too hard as it
-	is documented by Philips */
+	keyURL := getBridgeUrl() + string(apiKey)
 
 	var roomNumber int = 1 /* TODO get the room number dynamically */
 
