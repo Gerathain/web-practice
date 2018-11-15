@@ -129,7 +129,7 @@ func getBridgeUrl() string {
 	return "http://192.168.0.17/api/"
 }
 
-func getApiKey( fileName string ) {
+func getApiKey( fileName string ) string {
 	k, _ := ioutil.ReadFile( "./" + fileName )
 	apiKey := strings.TrimSuffix(string(k), "\n")
 
