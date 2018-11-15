@@ -129,6 +129,13 @@ func getBridgeUrl() string {
 	return "http://192.168.0.17/api/"
 }
 
+func getApiKey( fileName string ) {
+	k, _ := ioutil.ReadFile( "./" + fileName )
+	apiKey := strings.TrimSuffix(string(k), "\n")
+
+	return apiKey
+}
+
 func main() {
 	/* This will be useful if I want the script to return something to the
 	   user via HTTP
@@ -141,9 +148,7 @@ func main() {
 	}
 	*/
 
-	k, _ := ioutil.ReadFile("./apiKey")
-	apiKey := strings.TrimSuffix(string(k), "\n")
-	keyURL := getBridgeUrl() + string(apiKey)
+	keyURL := getBridgeUrl() + getApiKey( "apiKey" )
 
 	var roomNumber int = 1 /* TODO get the room number dynamically */
 
