@@ -134,16 +134,19 @@ func getState(url string, roomNumber int) Group {
 /* Reads the specified config file and returns a Config variable with the 
 controller's configuration
 */
-func readConfig( configFileName string ) Config {
-	config := Config{}
+func readConfig( configFileName string , config *Config) error {
 
-	configFile, _ := ioutil.ReadFile( "./" + configFileName )
-	if err := json.Unmarshal(configFile, &config); err == nil {
-		fmt.Println(err)
-		return nil
+	configFile, err := ioutil.ReadFile( "./" + configFileName )
+	if err != nil {
+		return err
 	}
+	if err = json.Unmarshal(configFile, &config); err != nil {
+		return err
+	}
+	
 
-	return config
+
+	return nil
 }
 
 func main() {
@@ -158,11 +161,12 @@ func main() {
 	}
 	*/
 
-	config := readConfig("config")
-	if config == nil {
-		fmt.Println( "config file not read correctly" )
+	var config Config
+	if err := readConfig( "config", &config) ; err!= nil {
+		fmt.Println( err )
 		return
 	}
+	fmt.Println(config)
 	if config.ControllerOn == false {
 		return
 	}
