@@ -12,3 +12,12 @@ func TestGetBridgeUrl(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetApiKey(t *testing.T) {
+	correctKey := "YaX2vXeBA3W-w6sNNwpkebTheJjAVPE0tgCQ86NG"
+
+	retVal := getApiKey( "apiKey" )
+	if correctKey != retVal {
+		t.Fail()
+	}
+}
