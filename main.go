@@ -148,7 +148,6 @@ func readConfig( configFileName string , config *Config) error {
 	
 	//reflection to get members of struct Config to check that none are nil
 	v := reflect.ValueOf(config)
-	//values := make([]interface{}, v.NumField())
 
 	// v is a reflect.Value type, we know it is a pointer (because config is a pointer) so we dereference with Elem()
 	for i := 0; i < v.Elem().NumField(); i++ {
