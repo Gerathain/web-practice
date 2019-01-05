@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"reflect"
 	"errors"
+	"time"
 )
 
 const MAX_CT int = 454
@@ -199,15 +200,22 @@ func main() {
 		return
 	}
 
+	// need to check if we are after the time to start running
+	t := time.Now()
+	hour, minute, _ := t.Clock()
+	// This current if means that the controller will always consider midnight as before the time to change the lights
+	if !( ( hour > *(config.StartHour) ) || ( hour == *(config.StartHour) && minute >= *(config.StartMinute) ) ) {
+		//Not time to change the lights
+		return	
+	}
+	
 	var roomNumber int = 1 /* TODO get the room number dynamically */
 
 	group := getState(keyURL, roomNumber) 
 	actualCt := group.Action.Ct
 
 	if actualCt < MAX_CT {
-		/* for the minute, increasing ct by 10 per cycle seems good. and means the script doesnt have to run so frequently,
-		might change to 5 or so */
-		group.Action.Ct += 50
+		group.Action.Ct += *(config.WarmingRate)
 	}
 
 	res, _ := json.Marshal(group.Action)

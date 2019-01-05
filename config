@@ -2,5 +2,5 @@
 "controller_on":true,
 "start_hour":21,
 "start_minute":0,
-"warming_rate":50
+"warming_rate":10
 }
