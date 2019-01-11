@@ -206,6 +206,7 @@ func main() {
 	// This current if means that the controller will always consider midnight as before the time to change the lights
 	if !( ( hour > *(config.StartHour) ) || ( hour == *(config.StartHour) && minute >= *(config.StartMinute) ) ) {
 		//Not time to change the lights
+		fmt.Println("Not time to change the lights")
 		return	
 	}
 	
